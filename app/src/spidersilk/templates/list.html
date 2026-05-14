@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spidersilk — Processed files</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Spidersilk</h1>
+    <nav>
+      <a href="/">Upload</a>
+      <a href="/files">Processed files</a>
+    </nav>
+  </header>
+  <main class="container">
+    <section class="card">
+      <h2>Processed files</h2>
+      <p class="hint">Bucket: <code>{{ bucket }}</code></p>
+      {% if objects %}
+      <table>
+        <thead>
+          <tr><th>Key</th><th>Size (bytes)</th><th>Uploaded (UTC)</th></tr>
+        </thead>
+        <tbody>
+          {% for o in objects %}
+          <tr>
+            <td><code>{{ o.key }}</code></td>
+            <td>{{ o.size }}</td>
+            <td>{{ o.last_modified.strftime("%Y-%m-%d %H:%M:%S") }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <p>No files yet.</p>
+      {% endif %}
+    </section>
+  </main>
+  <footer class="footer">spidersilk</footer>
+</body>
+</html>

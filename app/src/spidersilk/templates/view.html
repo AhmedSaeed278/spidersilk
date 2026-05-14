@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spidersilk — {{ filename }}</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Spidersilk</h1>
+    <nav>
+      <a href="/">Upload</a>
+      <a href="/files">Processed files</a>
+    </nav>
+  </header>
+  <main class="container">
+    <section class="card">
+      <h2>{{ filename }}</h2>
+      <p class="hint">
+        Stored as <code>{{ key }}</code> &middot; {{ row_count }} rows parsed.
+      </p>
+      <table>
+        <thead>
+          <tr><th>#</th><th>SKU</th><th>Name</th><th>Price</th></tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ r.sku }}</td>
+            <td>{{ r.name }}</td>
+            <td>{{ "%.2f"|format(r.price) }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <footer class="footer">spidersilk</footer>
+</body>
+</html>

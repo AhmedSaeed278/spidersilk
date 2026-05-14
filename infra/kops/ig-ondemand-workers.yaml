@@ -1,0 +1,27 @@
+# On-demand workers for system & latency-sensitive workloads.
+# Tagged for Cluster Autoscaler auto-discovery.
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  name: nodes-ondemand
+  labels:
+    kops.k8s.io/cluster: spidersilk.k8s.local
+spec:
+  role: Node
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20240701
+  machineType: m5.large
+  minSize: 2
+  maxSize: 6
+  subnets:
+    - us-east-1a
+    - us-east-1b
+    - us-east-1c
+  rootVolumeSize: 80
+  rootVolumeType: gp3
+  nodeLabels:
+    lifecycle: on-demand
+    workload: system
+  cloudLabels:
+    k8s.io/cluster-autoscaler/enabled: "true"
+    k8s.io/cluster-autoscaler/spidersilk.k8s.local: "owned"
+    k8s.io/cluster-autoscaler/node-template/label/lifecycle: "on-demand"

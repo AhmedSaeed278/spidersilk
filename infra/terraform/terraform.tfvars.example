@@ -1,0 +1,9 @@
+region                  = "us-east-1"
+environment             = "dev"
+glacier_transition_days = 30
+expire_days             = 365
+
+# Set these after kops creates the cluster's OIDC provider.
+create_irsa_role  = false
+# oidc_provider_arn = "arn:aws:iam::000000000000:oidc-provider/oidc.spidersilk.k8s.local"
+# oidc_provider_url = "oidc.spidersilk.k8s.local"

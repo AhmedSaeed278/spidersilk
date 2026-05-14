@@ -1,0 +1,11 @@
+{{ include "spidersilk.fullname" . }} deployed.
+
+1. Verify rollout:
+   kubectl -n {{ .Release.Namespace }} rollout status deploy/{{ include "spidersilk.fullname" . }}
+
+2. Port-forward to test locally:
+   kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "spidersilk.fullname" . }} 8080:{{ .Values.service.port }}
+   then open http://localhost:8080
+
+3. HPA status:
+   kubectl -n {{ .Release.Namespace }} get hpa {{ include "spidersilk.fullname" . }}

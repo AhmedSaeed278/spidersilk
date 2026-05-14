@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Spidersilk — CSV uploader</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>Spidersilk</h1>
+    <nav>
+      <a href="/">Upload</a>
+      <a href="/files">Processed files</a>
+    </nav>
+  </header>
+  <main class="container">
+    <section class="card">
+      <h2>Upload a CSV</h2>
+      <p class="hint">Expected schema: <code>sku, name, price</code> (no header row).</p>
+      <form action="/upload" method="post" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".csv,text/csv" required />
+        <button type="submit">Upload &amp; process</button>
+      </form>
+    </section>
+  </main>
+  <footer class="footer">
+    <span>spidersilk v{{ version }}</span>
+  </footer>
+</body>
+</html>

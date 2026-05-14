@@ -1,0 +1,8 @@
+---
+helm_bin: helm
+kubectl_bin: kubectl
+chart_path: "{{ playbook_dir }}/../helm/spidersilk"
+rendered_values_path: "/tmp/spidersilk-values-{{ env | default('dev') }}.yaml"
+release_name: spidersilk
+app_namespace: spidersilk
+helm_timeout: 5m

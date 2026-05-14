@@ -1,0 +1,105 @@
+# Default values for spidersilk.
+nameOverride: ""
+fullnameOverride: ""
+
+image:
+  repository: docker.io/ahmedsaeed/spidersilk-csv-app
+  tag: "0.1.0"
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+
+nginx:
+  image:
+    repository: nginxinc/nginx-unprivileged
+    tag: "1.27-alpine"
+    pullPolicy: IfNotPresent
+  resources:
+    requests: { cpu: "25m", memory: "32Mi" }
+    limits:   { cpu: "200m", memory: "128Mi" }
+
+replicaCount: 2
+
+# App-level configuration. Rendered into a ConfigMap and consumed as env vars.
+# Ansible may override values here per environment.
+config:
+  environment: dev
+  logLevel: INFO
+  s3Prefix: "uploads/"
+  maxUploadBytes: 10485760  # 10 MiB
+
+# Configured separately because it's environment-specific infra, not app behaviour.
+s3:
+  bucket: spidersilk-csv-archive-dev
+  region: us-east-1
+
+resources:
+  requests: { cpu: "100m", memory: "128Mi" }
+  limits:   { cpu: "500m", memory: "512Mi" }
+
+# Autoscaling
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 70
+  targetMemoryUtilizationPercentage: 80
+
+pdb:
+  enabled: true
+  minAvailable: 1
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: spidersilk.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+serviceAccount:
+  create: true
+  # Annotations are env-specific. For IRSA on kops/EKS clusters set e.g.:
+  #   eks.amazonaws.com/role-arn: arn:aws:iam::123456789012:role/spidersilk-app
+  annotations: {}
+  name: ""
+
+podSecurityContext:
+  runAsNonRoot: true
+  runAsUser: 10001
+  runAsGroup: 10001
+  fsGroup: 10001
+  seccompProfile:
+    type: RuntimeDefault
+
+securityContext:
+  allowPrivilegeEscalation: false
+  readOnlyRootFilesystem: true
+  capabilities:
+    drop: ["ALL"]
+
+nodeSelector: {}
+tolerations: []
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: spidersilk
+          topologyKey: kubernetes.io/hostname
+
+# Spot tolerations example (uncomment for spot-scheduling):
+# tolerations:
+#   - key: spot
+#     operator: Equal
+#     value: "true"
+#     effect: NoSchedule

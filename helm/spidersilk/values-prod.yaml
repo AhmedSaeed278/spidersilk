@@ -1,0 +1,40 @@
+replicaCount: 3
+
+config:
+  environment: prod
+  logLevel: WARNING
+
+s3:
+  bucket: spidersilk-csv-archive-prod
+  region: us-east-1
+
+autoscaling:
+  minReplicas: 3
+  maxReplicas: 20
+  targetCPUUtilizationPercentage: 60
+
+resources:
+  requests: { cpu: "200m", memory: "256Mi" }
+  limits:   { cpu: "1000m", memory: "1Gi" }
+
+serviceAccount:
+  annotations:
+    eks.amazonaws.com/role-arn: arn:aws:iam::000000000000:role/spidersilk-app-prod
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: spidersilk.example.com
+      paths:
+        - path: /
+          pathType: Prefix
+  tls:
+    - hosts: [spidersilk.example.com]
+      secretName: spidersilk-tls
+
+tolerations:
+  - key: spot
+    operator: Equal
+    value: "true"
+    effect: NoSchedule

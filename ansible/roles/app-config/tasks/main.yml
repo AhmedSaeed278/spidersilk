@@ -1,0 +1,11 @@
+---
+- name: Render Helm values from Ansible-managed config
+  ansible.builtin.template:
+    src: values.yaml.j2
+    dest: "{{ rendered_values_path }}"
+    mode: "0644"
+  tags: [config]
+
+- name: Show rendered values path
+  ansible.builtin.debug:
+    msg: "Rendered values written to {{ rendered_values_path }}"

@@ -1,0 +1,21 @@
+---
+# Used when --extra-vars "env=prod" and host is in the 'prod' group
+# (or when --inventory selects prod).
+env: prod
+
+replicas: 5
+
+autoscaling:
+  min: 5
+  max: 30
+  cpu_target: 60
+
+s3:
+  bucket: spidersilk-csv-archive-prod
+  region: us-east-1
+
+app:
+  environment: prod
+  log_level: WARNING
+  s3_prefix: "uploads/"
+  max_upload_bytes: 10485760

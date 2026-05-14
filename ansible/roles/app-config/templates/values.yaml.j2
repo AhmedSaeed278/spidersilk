@@ -1,0 +1,31 @@
+{# Rendered by Ansible -- do not hand-edit. Source: ansible/inventory/group_vars #}
+image:
+  repository: {{ image_repository }}
+  tag: "{{ image_tag }}"
+
+replicaCount: {{ replicas }}
+
+config:
+  environment: {{ app.environment }}
+  logLevel: {{ app.log_level }}
+  s3Prefix: "{{ app.s3_prefix }}"
+  maxUploadBytes: {{ app.max_upload_bytes }}
+
+s3:
+  bucket: {{ s3.bucket }}
+  region: {{ s3.region }}
+
+autoscaling:
+  enabled: true
+  minReplicas: {{ autoscaling.min }}
+  maxReplicas: {{ autoscaling.max }}
+  targetCPUUtilizationPercentage: {{ autoscaling.cpu_target }}
+
+serviceAccount:
+  create: true
+{% if service_account_role_arn %}
+  annotations:
+    eks.amazonaws.com/role-arn: "{{ service_account_role_arn }}"
+{% else %}
+  annotations: {}
+{% endif %}

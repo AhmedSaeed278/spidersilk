@@ -1,0 +1,47 @@
+# Helm values for the official Cluster Autoscaler chart:
+#   helm repo add autoscaler https://kubernetes.github.io/autoscaler
+#   helm upgrade --install cluster-autoscaler autoscaler/cluster-autoscaler \
+#     --namespace kube-system -f infra/cluster-autoscaler/values.yaml
+#
+# Use this only if you opted out of the kops-managed Cluster Autoscaler addon
+# in cluster.yaml (clusterAutoscaler.enabled: false).
+fullnameOverride: cluster-autoscaler
+
+autoDiscovery:
+  clusterName: spidersilk.k8s.local
+
+awsRegion: us-east-1
+
+cloudProvider: aws
+
+# Auto-discovery requires the ASG tags that we set on every IG:
+#   k8s.io/cluster-autoscaler/enabled = true
+#   k8s.io/cluster-autoscaler/<cluster-name> = owned
+
+extraArgs:
+  balance-similar-node-groups: "true"
+  expander: least-waste
+  scale-down-utilization-threshold: "0.5"
+  scale-down-unneeded-time: "10m"
+  scan-interval: "30s"
+  skip-nodes-with-system-pods: "false"
+  skip-nodes-with-local-storage: "false"
+
+rbac:
+  create: true
+  serviceAccount:
+    create: true
+    name: cluster-autoscaler
+    annotations:
+      # IRSA role for the autoscaler — provisioned out-of-band or by extending
+      # the Terraform stack in infra/terraform.
+      eks.amazonaws.com/role-arn: arn:aws:iam::000000000000:role/cluster-autoscaler
+
+resources:
+  requests: { cpu: 100m, memory: 300Mi }
+  limits:   { cpu: 200m, memory: 600Mi }
+
+priorityClassName: system-cluster-critical
+
+podDisruptionBudget:
+  maxUnavailable: 1

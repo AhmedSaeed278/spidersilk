@@ -1,0 +1,60 @@
+---
+- name: Ensure helm is available
+  ansible.builtin.command: "{{ helm_bin }} version --short"
+  changed_when: false
+  register: helm_version
+  tags: [deploy]
+
+- name: Ensure kubectl is available
+  ansible.builtin.command: "{{ kubectl_bin }} version --client=true -o yaml"
+  changed_when: false
+  register: kubectl_version
+  tags: [deploy]
+
+- name: Show tool versions
+  ansible.builtin.debug:
+    msg:
+      - "helm: {{ helm_version.stdout }}"
+      - "kubectl: client OK"
+  tags: [deploy]
+
+- name: Lint the chart before installing
+  ansible.builtin.command: "{{ helm_bin }} lint {{ chart_path }} -f {{ rendered_values_path }}"
+  changed_when: false
+  tags: [deploy]
+
+- name: Ensure namespace exists
+  ansible.builtin.command: >
+    {{ kubectl_bin }} get namespace {{ app_namespace }}
+  register: ns_check
+  failed_when: false
+  changed_when: false
+  tags: [deploy]
+
+- name: Create namespace if missing
+  ansible.builtin.command: "{{ kubectl_bin }} create namespace {{ app_namespace }}"
+  when: ns_check.rc != 0
+  tags: [deploy]
+
+- name: Helm upgrade --install spidersilk
+  ansible.builtin.command: >
+    {{ helm_bin }} upgrade --install {{ release_name }} {{ chart_path }}
+    --namespace {{ app_namespace }}
+    --values {{ rendered_values_path }}
+    --atomic
+    --timeout {{ helm_timeout }}
+    --wait
+  register: helm_result
+  changed_when: "'has been upgraded' in helm_result.stdout or 'has been installed' in helm_result.stdout"
+  tags: [deploy]
+
+- name: Wait for rollout
+  ansible.builtin.command: >
+    {{ kubectl_bin }} -n {{ app_namespace }} rollout status deploy/{{ release_name }} --timeout=180s
+  changed_when: false
+  tags: [deploy]
+
+- name: Summary
+  ansible.builtin.debug:
+    msg: "spidersilk release '{{ release_name }}' is healthy in namespace '{{ app_namespace }}'."
+  tags: [deploy]

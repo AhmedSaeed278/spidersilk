@@ -1,0 +1,13 @@
+apiVersion: v2
+name: spidersilk
+description: Spidersilk CSV uploader & processor — FastAPI app fronted by Nginx, sharing static assets via emptyDir.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+maintainers:
+  - name: Ahmed Saeed
+keywords:
+  - csv
+  - s3
+  - fastapi
+  - devops

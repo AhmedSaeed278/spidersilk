@@ -1,0 +1,42 @@
+# Spot workers via Mixed Instances Policy.
+# kops translates `mixedInstancesPolicy` into an ASG with multiple instance
+# types, allowing the AZ + capacity diversification recommended by AWS.
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  name: nodes-spot
+  labels:
+    kops.k8s.io/cluster: spidersilk.k8s.local
+spec:
+  role: Node
+  image: 099720109477/ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-20240701
+  machineType: m5.large
+  minSize: 0
+  maxSize: 20
+  subnets:
+    - us-east-1a
+    - us-east-1b
+    - us-east-1c
+  rootVolumeSize: 80
+  rootVolumeType: gp3
+  nodeLabels:
+    lifecycle: spot
+    workload: batch
+  taints:
+    - "spot=true:NoSchedule"
+  mixedInstancesPolicy:
+    instances:
+      - m5.large
+      - m5a.large
+      - m5n.large
+      - m4.large
+      - m6i.large
+    onDemandAboveBase: 0
+    onDemandBase: 0
+    spotAllocationStrategy: capacity-optimized
+    spotInstancePools: 4
+  cloudLabels:
+    k8s.io/cluster-autoscaler/enabled: "true"
+    k8s.io/cluster-autoscaler/spidersilk.k8s.local: "owned"
+    k8s.io/cluster-autoscaler/node-template/label/lifecycle: "spot"
+    k8s.io/cluster-autoscaler/node-template/taint/spot: "true:NoSchedule"

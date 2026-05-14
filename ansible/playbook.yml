@@ -1,0 +1,9 @@
+---
+- name: Deploy spidersilk to Kubernetes
+  hosts: deploy
+  gather_facts: false
+  roles:
+    - role: app-config
+      tags: [config]
+    - role: helm-deploy
+      tags: [deploy]

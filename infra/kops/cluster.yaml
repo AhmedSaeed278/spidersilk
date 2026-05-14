@@ -1,0 +1,96 @@
+apiVersion: kops.k8s.io/v1alpha2
+kind: Cluster
+metadata:
+  name: spidersilk.k8s.local
+spec:
+  # Required for kops; can be a real Route53 zone or .k8s.local (gossip).
+  channel: stable
+  cloudProvider: aws
+  configBase: s3://spidersilk-kops-state/spidersilk.k8s.local
+
+  kubernetesVersion: 1.29.7
+
+  networking:
+    cilium: {}     # eBPF-based CNI; calico is also fine. Pick one and pin it.
+
+  # IAM/OIDC: required for IRSA. The serviceAccount on the Spidersilk app uses
+  # the role provisioned by infra/terraform.
+  iam:
+    allowContainerRegistry: true
+    legacy: false
+    serviceAccountExternalPermissions: []
+  serviceAccountIssuerDiscovery:
+    discoveryStore: s3://spidersilk-kops-oidc/spidersilk.k8s.local
+    enableAWSOIDCProvider: true
+
+  # API LB across 3 AZs
+  api:
+    loadBalancer:
+      type: Public
+      class: Network
+
+  authorization:
+    rbac: {}
+
+  etcdClusters:
+    - name: main
+      etcdMembers:
+        - instanceGroup: control-plane-us-east-1a
+          name: a
+        - instanceGroup: control-plane-us-east-1b
+          name: b
+        - instanceGroup: control-plane-us-east-1c
+          name: c
+    - name: events
+      etcdMembers:
+        - instanceGroup: control-plane-us-east-1a
+          name: a
+        - instanceGroup: control-plane-us-east-1b
+          name: b
+        - instanceGroup: control-plane-us-east-1c
+          name: c
+
+  topology:
+    dns:
+      type: Public
+    masters: private
+    nodes: private
+
+  # Cluster Autoscaler add-on (kops will install it).
+  clusterAutoscaler:
+    enabled: true
+    balanceSimilarNodeGroups: true
+    expander: least-waste
+    scaleDownUtilizationThreshold: "0.5"
+    awsUseStaticInstanceList: false
+
+  subnets:
+    - name: us-east-1a
+      zone: us-east-1a
+      type: Private
+      cidr: 172.20.32.0/19
+    - name: us-east-1b
+      zone: us-east-1b
+      type: Private
+      cidr: 172.20.64.0/19
+    - name: us-east-1c
+      zone: us-east-1c
+      type: Private
+      cidr: 172.20.96.0/19
+    - name: utility-us-east-1a
+      zone: us-east-1a
+      type: Utility
+      cidr: 172.20.0.0/22
+    - name: utility-us-east-1b
+      zone: us-east-1b
+      type: Utility
+      cidr: 172.20.4.0/22
+    - name: utility-us-east-1c
+      zone: us-east-1c
+      type: Utility
+      cidr: 172.20.8.0/22
+
+  networkCIDR: 172.20.0.0/16
+
+  sshAccess: [0.0.0.0/0]
+  kubernetesApiAccess: [0.0.0.0/0]

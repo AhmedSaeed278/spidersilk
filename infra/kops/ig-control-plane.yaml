@@ -1,0 +1,45 @@
+# 3-AZ HA control plane. Each AZ is a separate IG so kops can spread etcd members.
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  name: control-plane-us-east-1a
+  labels:
+    kops.k8s.io/cluster: spidersilk.k8s.local
+spec:
+  role: ControlPlane
+  machineType: t3.medium
+  minSize: 1
+  maxSize: 1
+  subnets: [us-east-1a]
+  rootVolumeSize: 64
+  rootVolumeType: gp3
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  name: control-plane-us-east-1b
+  labels:
+    kops.k8s.io/cluster: spidersilk.k8s.local
+spec:
+  role: ControlPlane
+  machineType: t3.medium
+  minSize: 1
+  maxSize: 1
+  subnets: [us-east-1b]
+  rootVolumeSize: 64
+  rootVolumeType: gp3
+---
+apiVersion: kops.k8s.io/v1alpha2
+kind: InstanceGroup
+metadata:
+  name: control-plane-us-east-1c
+  labels:
+    kops.k8s.io/cluster: spidersilk.k8s.local
+spec:
+  role: ControlPlane
+  machineType: t3.medium
+  minSize: 1
+  maxSize: 1
+  subnets: [us-east-1c]
+  rootVolumeSize: 64
+  rootVolumeType: gp3
