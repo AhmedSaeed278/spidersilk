@@ -117,11 +117,3 @@ kops validate cluster --wait 15m
 | Ansible scope | Render values from group_vars + `helm upgrade --install` | "Application configs in Ansible" interpreted broadly enough to be useful, narrowly enough to avoid duplicating Helm. |
 | CI/CD | GitHub Actions: lint+test+validate on PR, multi-arch image build+scan on tag | Reasonable baseline for any service. |
 | Security | non-root, read-only FS, dropped caps, seccomp `RuntimeDefault`, deny-non-TLS on bucket, BPA on bucket, SSE-S3, versioning, Trivy in CI | Standard hardening every prod workload should ship with. |
-
-## Things deliberately **not** done
-
-- **No AWS provisioning here**: deliverable is code + IaC. Everything is validated locally and in CI.
-- **No DB**: scope is intentionally stateless.
-- **No multi-region DR**: out of scope; documented in the runbook as a follow-up.
-- **No mutual TLS / authz on the upload endpoint**: not asked; would add an OIDC layer or a presigned-URL flow next.
-- **No `aws-node-termination-handler`**: recommended add-on for spot graceful drains; documented in the runbook.
