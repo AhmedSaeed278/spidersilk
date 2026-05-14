@@ -1,6 +1,10 @@
+from pathlib import Path
+
 import pytest
 
 from spidersilk.csv_parser import CsvParseError, parse_all
+
+SAMPLE_CSV = Path(__file__).resolve().parents[2] / "samples" / "soh.csv"
 
 
 def test_parse_basic():
@@ -32,3 +36,11 @@ def test_rejects_bad_price():
     raw = b'"1","a","not-a-number"\n'
     with pytest.raises(CsvParseError):
         parse_all(raw)
+
+
+@pytest.mark.skipif(not SAMPLE_CSV.exists(), reason="samples/soh.csv not present")
+def test_parses_real_sample_csv():
+    rows = parse_all(SAMPLE_CSV.read_bytes())
+    assert len(rows) >= 700, f"expected >=700 rows from sample, got {len(rows)}"
+    for r in rows[:5]:
+        assert r.sku and r.name and r.price > 0

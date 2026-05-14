@@ -45,7 +45,7 @@ kubectl -n spidersilk port-forward svc/spidersilk 8080:80 &
 open http://localhost:8080
 ```
 
-Upload `../soh-1-.csv` (the sample CSV that ships alongside this repo). To make `/files` non-empty, point the app at an S3 endpoint via env (`SPIDERSILK_S3_ENDPOINT_URL`, e.g. LocalStack) or run against a real bucket.
+Upload `samples/soh.csv` (the sample CSV that ships with the repo). To make `/files` non-empty, point the app at an S3 endpoint via env (`SPIDERSILK_S3_ENDPOINT_URL`, e.g. LocalStack) or run against a real bucket.
 
 ## Quality gates
 

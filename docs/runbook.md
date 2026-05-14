@@ -76,7 +76,7 @@ kubectl -n spidersilk get pods,svc,hpa,pdb
 kubectl -n spidersilk port-forward svc/spidersilk 8080:80
 ```
 
-Open <http://localhost:8080>, upload `soh-1-.csv` (sample at the repo root), confirm rows render and the bucket has the object. Then visit `/files` to see it listed.
+Open <http://localhost:8080>, upload `samples/soh.csv`, confirm rows render and the bucket has the object. Then visit `/files` to see it listed.
 
 ## 6. Rollback
 
